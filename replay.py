@@ -19,6 +19,7 @@ for file in onlyfiles:
 
 print('\n')
 ch = input('Enter the replay you want to play: ')
+os.system('clear')
 
 filename = path + '/' +onlyfiles[int(ch) - 1]
 
@@ -30,7 +31,8 @@ file.close()
 slides = data.split('=====')
 
 for slide in slides:
-    os.system('clear')
+    print("\033[%d;%dH" % (0, 0), end='')
     print(slide)
     # add delay of 0.3 seconds
     time.sleep(0.3)
+os.system('clear')

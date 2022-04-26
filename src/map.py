@@ -4,7 +4,7 @@ init(autoreset=True)
 import points as pt
 import numpy as np
 import datetime
-from characters import barbarians, dragons
+from characters import barbarians, dragons, balloons, archers
 
 # 50 - 100 : cyan
 # 20 - 50 : yellow
@@ -33,6 +33,12 @@ def buildingColor(V,address):
             return Back.MAGENTA
         health = V.cannon_objs[(a,b)].health
         max_health = V.cannon_objs[(a,b)].max_health
+    elif type == pt.WIZARD_TOWER:
+        if V.wizard_tower_objs[(a,b)].isShooting:
+            return Back.MAGENTA
+        health = V.wizard_tower_objs[(a,b)].health
+        max_health = V.wizard_tower_objs[(a,b)].max_health
+
 
     health = (health*100)/max_health
     if(health > 50):
@@ -53,9 +59,33 @@ def barbColor(barb):
     else:
         return Back.WHITE
 
+
+
 def drColor(dr):
     health = dr.health
     max_health = dr.max_health
+    percentage = (health*100)/max_health
+    if(percentage > 50):
+        return Back.MAGENTA
+    elif percentage > 20:
+        return Back.BLUE
+    else:
+        return Back.WHITE
+
+def archColor(arch):
+    health = arch.health
+    max_health = arch.max_health
+    percentage = (health*100)/max_health
+    if(percentage > 50):
+        return Back.LIGHTMAGENTA_EX
+    elif percentage > 20:
+        return Back.LIGHTRED_EX
+    else:
+        return Back.YELLOW
+
+def blColor(bl):
+    health = bl.health
+    max_health = bl.max_health
     percentage = (health*100)/max_health
     if(percentage > 50):
         return Back.MAGENTA
@@ -121,25 +151,33 @@ def printMap(V):
                 map_matrix[2*i+1][2*j] = Back.WHITE + '  '
                 map_matrix[2*i+1][2*j+1] = Back.WHITE + '  '
             elif(map[i][j].split(':')[0] == pt.CANNON):
+                color = buildingColor(V,map[i][j])
                 map_matrix[2*i][2*j] = Back.GREEN + '  '
                 map_matrix[2*i][2*j+1] = Back.GREEN + '  '
                 map_matrix[2*i][2*j+2] = Back.GREEN + '  '
-                map_matrix[2*i][2*j+3] = buildingColor(V,map[i][j]) + '  '
+                map_matrix[2*i][2*j+3] = color + '  '
                 map_matrix[2*i+1][2*j] = Back.GREEN + '  '
-                map_matrix[2*i+1][2*j+1] = buildingColor(V,map[i][j]) + '  '
-                map_matrix[2*i+1][2*j+2] = buildingColor(V,map[i][j]) + '  '
+                map_matrix[2*i+1][2*j+1] = color + '  '
+                map_matrix[2*i+1][2*j+2] = color + '  '
                 map_matrix[2*i+1][2*j+3] = Back.GREEN + '  '
-                map_matrix[2*i+2][2*j] = buildingColor(V,map[i][j]) + 'CA'
-                map_matrix[2*i+2][2*j+1] = buildingColor(V,map[i][j]) + 'NN'
-                map_matrix[2*i+2][2*j+2] = buildingColor(V,map[i][j]) + 'ON' 
+                map_matrix[2*i+2][2*j] = color + 'CA'
+                map_matrix[2*i+2][2*j+1] = color + 'NN'
+                map_matrix[2*i+2][2*j+2] = color + 'ON' 
                 map_matrix[2*i+2][2*j+3] = Back.GREEN + '  '
-                map_matrix[2*i+3][2*j] = buildingColor(V,map[i][j]) + '  '
-                map_matrix[2*i+3][2*j+1] = buildingColor(V,map[i][j]) + '  '
+                map_matrix[2*i+3][2*j] = color + '  '
+                map_matrix[2*i+3][2*j+1] = color + '  '
                 map_matrix[2*i+3][2*j+2] = Back.GREEN + '  '
                 map_matrix[2*i+3][2*j+3] = Back.GREEN + '  '
                 map[i][j+1] = -1
                 map[i+1][j] = -1
                 map[i+1][j+1] = -1
+            elif(map[i][j].split(':')[0] == pt.WIZARD_TOWER):
+                color = buildingColor(V,map[i][j])
+                map_matrix[2*i][2*j] = color + 'WI'
+                map_matrix[2*i][2*j+1] = color + 'Z '
+                map_matrix[2*i+1][2*j] = color + ' T'
+                map_matrix[2*i+1][2*j+1] = color + 'WR'
+
             elif(map[i][j].split(':')[0] == pt.HUT):
                 map_matrix[2*i][2*j] = Back.GREEN + '  '
                 map_matrix[2*i][2*j+1] = Back.BLACK + '  '
@@ -200,15 +238,21 @@ def printMap(V):
                     map[k][j] = -1
                     map[k][j+1] = -1
                     map[k][j+2] = -1
-    pos = pt.KING_POS
+    pos = pt.HERO_POS
 
     if(pos != -1):
         a= 2*pos[0]
         b = 2*pos[1]
-        map_matrix[a][b] = Back.YELLOW + Fore.BLACK + '  '
-        map_matrix[a+1][b] = Back.YELLOW + Fore.BLACK + 'KI'
-        map_matrix[a][b+1] = Back.YELLOW + Fore.BLACK + '  '
-        map_matrix[a+1][b+1] = Back.YELLOW + Fore.BLACK + 'NG'
+        if(pt.hero == 0):
+            map_matrix[a][b] = Back.YELLOW + Fore.BLACK + '  '
+            map_matrix[a+1][b] = Back.YELLOW + Fore.BLACK + 'KI'
+            map_matrix[a][b+1] = Back.YELLOW + Fore.BLACK + '  '
+            map_matrix[a+1][b+1] = Back.YELLOW + Fore.BLACK + 'NG'
+        elif(pt.hero == 1):
+            map_matrix[a][b] = Back.LIGHTMAGENTA_EX + Fore.BLACK + 'QU'
+            map_matrix[a+1][b] = Back.LIGHTMAGENTA_EX + Fore.BLACK + 'N '
+            map_matrix[a][b+1] = Back.LIGHTMAGENTA_EX + Fore.BLACK + 'EE'
+            map_matrix[a+1][b+1] = Back.LIGHTMAGENTA_EX + Fore.BLACK + '  '
 
     for barb in barbarians:
         a= 2*barb.position[0]
@@ -218,6 +262,15 @@ def printMap(V):
         map_matrix[a][b+1] = barbColor(barb) + Fore.BLACK + 'RB'
         map_matrix[a+1][b+1] = barbColor(barb) + Fore.BLACK + '  '
 
+    for arch in archers:
+        a= 2*arch.position[0]
+        b = 2*arch.position[1]
+        map_matrix[a][b] = archColor(arch) + Fore.BLACK + 'AR'
+        map_matrix[a+1][b] = archColor(arch) + Fore.BLACK + '  '
+        map_matrix[a][b+1] = archColor(arch) + Fore.BLACK + 'CH'
+        map_matrix[a+1][b+1] = archColor(arch) + Fore.BLACK + 'ER'
+    
+
     for dr in dragons:
         a= 2*dr.position[0]
         b = 2*dr.position[1]
@@ -225,17 +278,26 @@ def printMap(V):
         map_matrix[a+1][b] = drColor(dr) + Fore.BLACK + 'ON'
         map_matrix[a][b+1] = drColor(dr) + Fore.BLACK + 'AG'
         map_matrix[a+1][b+1] = drColor(dr) + Fore.BLACK + '  '
+    
+    for bl in balloons:
+        a= 2*bl.position[0]
+        b = 2*bl.position[1]
+        map_matrix[a][b] = blColor(bl) + Fore.BLACK + 'BA'
+        map_matrix[a+1][b] = blColor(bl) + Fore.BLACK + 'OO'
+        map_matrix[a][b+1] = blColor(bl) + Fore.BLACK + 'LL'
+        map_matrix[a+1][b+1] = blColor(bl) + Fore.BLACK + 'N '
 
 
 
     store_replay(map_matrix)
+    store_level(V.level)
 
     
     for i in range(map_matrix.shape[0]):
         for j in range(map_matrix.shape[1]):
             print(map_matrix[i][j], end='')
         print('')
-
+    print('Level: ' + str(V.level), end='')
 
     
 
@@ -278,4 +340,12 @@ def store_healthbar(health_bar):
         file.write(health_bar[i])
     file.write('\n')
     file.write("=====")
+    file.close()
+
+def store_level(level):
+    # create a file name
+    file_name = 'replay_' + now.strftime("%Y-%m-%d_%H-%M-%S") + '.txt'
+    # open the file
+    file = open('./replays/' + file_name, 'a')
+    file.write(Back.BLACK + Fore.WHITE +'Level: ' + str(level) + '\n')
     file.close()
