@@ -1,9 +1,3 @@
-# Assignment 3.1
-
-Shreyash Jain
-
-2020101006
-
 - Everything mentioned in the assignment has been implemented.
 - **Bonus** :
     - King’s Leviathan Axe has also been implemented.
